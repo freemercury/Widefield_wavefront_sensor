@@ -26,6 +26,8 @@ CTRL_SIZE = [19,25]
 LOSS_CROP_RATIO = 0.98
 LOSS_TYPE = "l2"   # "l2", "l1", "grad"
 
+
+
 # args
 def parse_args():
     parser = argparse.ArgumentParser(description='Slope Estimation Arguments')
@@ -63,6 +65,8 @@ def parse_args():
     if isinstance(args.ctrl_size, str):
         args.ctrl_size = [int(i) for i in args.ctrl_size.split(',')]
     return vars(args)
+
+
 
 
 def img2slope():
