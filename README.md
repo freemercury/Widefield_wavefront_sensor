@@ -1,1 +1,1 @@
-# Widefield_wavefront_sensor
+# Wide-field Wavefront Sensor (WWS)
