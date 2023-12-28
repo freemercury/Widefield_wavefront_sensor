@@ -1,2 +1,3 @@
 data/phase_data/
 data/realign_data/
+__pycache__/

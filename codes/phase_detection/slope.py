@@ -1,5 +1,5 @@
 from helper import *
-from slope_estimation_model import *
+from phase_detection_model import SlopeEstimation
 import argparse
 import glob
 from scipy import io
@@ -67,8 +67,6 @@ def parse_args():
     return vars(args)
 
 
-
-
 def img2slope():
     args = parse_args()
 
@@ -87,7 +85,7 @@ def img2slope():
     if not op.exists(args["realign_data_path"]):
         raise Exception("realign data path not exist!")
     Helper.makedirs(args["phase_data_path"])
-    Helper.save_json(args, args["phase_data_path"] + "args_" + Helper.get_timestamp() + ".json")
+    Helper.save_json(args, args["phase_data_path"] + "slope_args_" + Helper.get_timestamp() + ".json")
     realign_data_files = glob.glob(args["realign_data_path"] + "*.tif")
 
     # initialize model
@@ -132,6 +130,8 @@ def img2slope():
                 Helper.tif_save_img(save_img, 
                                     args["phase_data_path"] + file.split("\\")[-1].replace(".tif", "_slope_view%d.png"%(test_view)),
                                     save_type="float32")
+
+
 
 
 if __name__ == "__main__":
