@@ -4,11 +4,18 @@ from .auxiliary import *
 class SlopeEstimationModule(nn.Module):
     def __init__(self, batch_size, phantom_size, ctrl_size):
         """
-        batch_size: int, same as length of valid_views
+        Initialize the module for slope estimation
 
-        phantom_size: (h,w), size of phantom
-
-        ctrl_size: (m,n), number of control pts
+        Parameters:
+            batch_size: int, same as length of valid_views
+            phantom_size: (h,w), size of phantom
+            ctrl_size: (m,n), number of control pts
+        
+        Input:
+            input_phantom: (b,1,h,w)
+        
+        Output:
+            warped_phantom: (b,1,h,w)
         """
         super(SlopeEstimationModule, self).__init__()
         self.batch_size = batch_size
@@ -22,7 +29,10 @@ class SlopeEstimationModule(nn.Module):
         
     def set_shiftmap(self, shiftmap=None):
         """
-        shiftmap: (b,m,n,2); if None, set to be zero
+        Set shiftmap to be a given value
+
+        Parameters:
+            shiftmap: torch.Tensor, (b,m,n,2); if None, set to be zero
         """
         if shiftmap is None:
             self.shiftmap.data = self.shiftmap.data * 0
@@ -31,7 +41,11 @@ class SlopeEstimationModule(nn.Module):
 
     def forward(self, input_phantom):
         """
-        input_phantom: (b,1,h,w)
+        Parameters:
+            input_phantom: torch.Tensor, (b,1,h,w)
+        
+        Return:
+            warped_phantom: torch.Tensor, (b,1,h,w)
         """
         if self.trans or (self.ctrl_size[0] == self.phantom_size[0] and self.ctrl_size[1] == self.phantom_size[1]):
             shift_mesh = self.mesh + self.shiftmap
@@ -44,17 +58,41 @@ class SlopeEstimationModule(nn.Module):
 
 
 class SlopeEstimation(nn.Module):
+    """
+    SlopeEstimation class
+
+    API:
+    ----------
+    set_mask_valid_views: set mask and valid views
+
+    set_phantom: set phantom and reference view
+
+    reset_shiftmap_models: reset shiftmap models to initial values
+
+    train: train shiftmap models
+
+    get_loss_curve_shiftmap: get epoch and loss curve of shiftmap training
+
+    get_warped_phantom: get input phantom, warped phantom and target phantom on test views
+
+    get_shiftmap: get shiftmap with full pupil size and control tps size
+
+    """
     def __init__(self, device, mask_size, phantom_size, phantom, mask_path, ref_view, 
                  norm_type, pooling_size=[1,1], kernel_size=20, sigma=3, ctrl_size=[19,25], loss_type="l2",
                  loss_crop_ratio=0.98, epochs=[20,100], lrs=[1e-2,1e-3]):
         """
+        Initialize SlopeEstimation
+
+        Parameters:
+        ----------
         device: torch.device
 
         mask_size: (n_view_x,n_view_y), size of mask, should NOT be None
 
         phantom_size: (h,w), size of phantom, should NOT be None
 
-        phantom: (n_views_x*n_view_y,1,h,w), (h,w) should be the same as phantom_size; if None, should use set_phantom to set phantom later
+        phantom: torch.Tensor, (n_views_x*n_view_y,1,h,w), (h,w) should be the same as phantom_size; if None, should use set_phantom to set phantom later
 
         mask_path: str, path of mask.mat, size of mask should be the same as mask_size; if None, automatically generate a circular mask with the same size as mask_size
 
@@ -122,7 +160,10 @@ class SlopeEstimation(nn.Module):
 
     def set_mask_valid_views(self, mask_path):
         """
-        mask_path: path to mask.mat, if None, generate a circular mask with the same size as mask_size
+        Set mask and valid views
+
+        Parameters:
+            mask_path: str, path to mask.mat, if None, generate a circular mask with the same size as mask_size
         """
         if mask_path is not None:
             self.mask_path = mask_path
@@ -139,9 +180,11 @@ class SlopeEstimation(nn.Module):
 
     def set_phantom(self, phantom, ref_view):
         """
-        phantom: (n_views_x*n_view_y,1,h,w), should NOT be None
+        Set phantom and reference view
 
-        ref_view: int, index between 0 and n_views_x*n_view_y-1
+        Parameters:
+            phantom: torch.Tensor, (n_views_x*n_view_y,1,h,w), should NOT be None
+            ref_view: int, index between 0 and n_views_x*n_view_y-1
         """
         if phantom is not None:
             self.phantom = phantom.to(self.device)
@@ -164,6 +207,9 @@ class SlopeEstimation(nn.Module):
             raise Exception("norm_type must be 'avg' or 'gauss' or None")
 
     def reset_shiftmap_models(self):
+        """
+        Reset shiftmap models to initial values
+        """
         self.model1.set_shiftmap()
         self.model2.set_shiftmap()
         self.loss = []
@@ -171,9 +217,11 @@ class SlopeEstimation(nn.Module):
 
     def train(self, epochs=None, lrs=None):
         """
-        epochs: list of int, number of epochs for coarse and fine training, if None, use self.epochs
+        Train shiftmap models
 
-        lrs: list of float, learning rate for coarse and fine training, if None, use self.lrs
+        Parameters:
+            epochs: (int, int), number of epochs for coarse and fine training, if None, use self.epochs
+            lrs: (float, float), learning rate for coarse and fine training, if None, use self.lrs
         """
         if epochs is not None:
             self.epochs = epochs
@@ -221,17 +269,23 @@ class SlopeEstimation(nn.Module):
 
     def get_loss_curve_shiftmap(self):
         """
-        loss curve for shiftmap training
-        
-        return epoch_list, loss_list
+        Get epoch and loss curve of shiftmap training
+
+        Return:
+            epoch: list of int, epoch of training
+            loss: list of float, loss of training
         """
         return self.epoch, self.loss
     
     def get_raw_shiftmap(self, scaling=True):
         """
-        scaling: bool, whether to re-scale the shiftmap's x and y to the same unit as y (2/h)
+        Get raw shiftmap with control tps size, (b,m,n,2)
 
-        return raw shiftmap, (b,m,n,2)
+        Parameters:
+            scaling: bool, whether to re-scale the shiftmap's x and y to the same unit as y (2/h)
+
+        Return:
+            raw shiftmap: torch.Tensor, (b,m,n,2)
         """
         shiftmap = self.model2.shiftmap.detach().clone()
         if scaling and self.phantom_size[0] != self.phantom_size[1]:
@@ -240,9 +294,13 @@ class SlopeEstimation(nn.Module):
 
     def get_shiftmap(self, scaling=True):
         """
-        return shiftmap with full pupil size and control tps size, (n_views,n_views,m,n,2)
+        Get shiftmap with full pupil size and control tps size, (n_views,n_views,m,n,2)
 
-        scaling: bool, whether to re-scale the shiftmap's x and y to the same unit as y (2/h)
+        Parameters:
+            scaling: bool, whether to re-scale the shiftmap's x and y to the same unit as y (2/h)
+
+        Return:
+            shiftmap: torch.Tensor, (n_views,n_views,m,n,2)
         """
         shiftmap = self.get_raw_shiftmap(scaling=scaling)
         shiftmap_full = shiftmap_convertor_validviews2fullsize(shiftmap, self.mask, self.valid_views)
@@ -250,25 +308,42 @@ class SlopeEstimation(nn.Module):
     
     def shiftmap_v2f(self, shiftmap):
         """
-        shiftmap: (n_valid_views,m,n,2)
+        Convert shiftmap from valid views to full size
 
-        return: shiftmap_full, (n_view_x,n_view_y,m,n,2)
+        Parameters:
+            shiftmap: torch.Tensor, (n_valid_views,m,n,2)
+
+        Return:
+            shiftmap_full: torch.Tensor, (n_view_x,n_view_y,m,n,2)
         """
         return shiftmap_convertor_validviews2fullsize(shiftmap, self.mask, self.valid_views)
     
     def shiftmap_f2v(self, shiftmap_full):
         """
-        shiftmap_full: (n_view_x,n_view_y,m,n,2)
+        Convert shiftmap from full size to valid views
 
-        return: shiftmap, (n_valid_views,m,n,2)
+        Parameters:
+            shiftmap_full: torch.Tensor, (n_view_x,n_view_y,m,n,2)
+        
+        Return:
+            shiftmap: torch.Tensor, (n_valid_views,m,n,2)
         """
         return shiftmap_convertor_fullsize2validviews(shiftmap_full, self.mask, self.valid_views)
 
     def get_warped_phantom(self, test_views):
         """
-        here test_views are the views to be tested, not the valid views
+        Get input phantom, warped phantom and target phantom on test views
 
-        count view_id on pupil size with row first 
+        Parameters:
+            test_views: list of int, test views, should be a subset of valid_views
+        
+        Return:
+            input_phantom: torch.Tensor, (b,1,h,w), b is the length of test_views
+            warped_phantom: torch.Tensor, (b,1,h,w)
+            target_phantom: torch.Tensor, (b,1,h,w)
+            input_norm: torch.Tensor, (b,1,h,w), b is the length of test_views
+            target_norm: torch.Tensor, (b,1,h,w)
+            valid_test_views: list of int, test views, should be a common subset of test_views and valid_views
         """
         self.model2.eval()
         # raw model output

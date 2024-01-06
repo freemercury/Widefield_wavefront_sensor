@@ -12,11 +12,11 @@ GPU_ID = 0  # set to None for cpu
 MASK_SIZE = [15,15]
 HIDDEN_SIZE = [300,500] # hidden layer size of mlp
 NUM_ZERNIKE = 35     # number of zernike modes
-EPOCH = 10
-LR = 1e-4
-BATCH_SIZE = 128
-VALID = True
-SPLIT = 0.9
+EPOCH = 10  # number of epochs
+LR = 1e-4   # learning rate
+BATCH_SIZE = 128    # batch size
+VALID = True    # whether to use validation set
+SPLIT = 0.9 # train / (train + valid) split ratio
 
 # args
 def parse_args():

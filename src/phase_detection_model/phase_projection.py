@@ -9,7 +9,18 @@ import os.path as op
 class MLP(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         """
-        hidden_size: tuple of hidden layer sizes, might be any length
+        Initialize MLP
+
+        Parameters:
+            input_size: int, input size
+            output_size: int, output size
+            hidden_size: tuple of hidden layer sizes, might be any length
+
+        Input: 
+            x: torch.Tensor, (*,input_size)
+
+        Output:
+            output: torch.Tensor, (*,output_size)
         """
         super(MLP, self).__init__()
         self.input_size = input_size
@@ -23,21 +34,48 @@ class MLP(nn.Module):
         self.layers.append(nn.Linear(hidden_size[-1], output_size))
         
     def forward(self, x):
+        """
+        Parameters:
+            x: torch.Tensor, (*,input_size)
+
+        Return:
+            output: torch.Tensor, (*,output_size)
+        """
         for layer in self.layers[:-1]:
             x = F.relu(layer(x))
         return self.layers[-1](x)
     
 
 class PhaseProjection(nn.Module):
+    """
+    PhaseProjection model, which is a MLP model that maps slope to zernike polynomials
+
+    API:
+    ----------
+    train: train model
+
+    test: evaluate model on test set
+
+    inference: inference zernike polynomials from slope
+
+    save: save model to "path/pp_ckpt_%d.pkl" % (epoch)
+
+    load: load model from "path/pp_ckpt_%d.pkl" % (epoch)
+
+    """
     def __init__(self, device, hidden_size, num_zernike, mask_size, mask_path, epoch=10, lr=1e-4, batch_size=128, valid=True, split=0.9):
         """
+        Initialize PhaseProjection
+
+        Parameters:
+        ----------
         device: torch.device
 
-        hidden_size: tuple of hidden layer sizes, might be any length
+        hidden_size: Tuple[int], hidden layer sizes, might be any length
 
         num_zernike: int, number of zernike polynomials
 
-        mask_size: (n_view_x,n_view_y), size of mask, should NOT be None
+        mask_size: Tuple[int], size of mask (n_view_x, n_view_y), should NOT be None
 
         mask_path: str, path of mask.mat, size of mask should be the same as mask_size; if None, automatically generate a circular mask with the same size as mask_size
 
@@ -47,7 +85,7 @@ class PhaseProjection(nn.Module):
 
         batch_size: int, batch size
 
-        valid: whether to split training set into training and validation set
+        valid: bool, whether to split training set into training and validation set
 
         split: float, ratio of training set to the whole dataset, only valid when valid is True
         """
@@ -78,7 +116,10 @@ class PhaseProjection(nn.Module):
     
     def set_mask_valid_views(self, mask_path):
         """
-        mask_path: path to mask.mat, if None, generate a circular mask with the same size as mask_size
+        Set mask and valid views
+
+        Parameters:
+            mask_path: str, path to mask.mat, if None, generate a circular mask with the same size as mask_size
         """
         if mask_path is not None:
             self.mask_path = mask_path
@@ -94,6 +135,9 @@ class PhaseProjection(nn.Module):
                 self.valid_views = [i*n_view_y+j for i in range(n_view_x) for j in range(n_view_y) if not self.mask[i,j].isnan()]
 
     def reset_model(self):
+        """
+        Reset shiftmaps to zeros
+        """
         self.model = MLP(self.input_dim, self.hidden_size, self.num_zernike).to(self.device)
         self.X_mean, self.X_std, self.y_mean, self.y_std = None, None, None, None
         self.loss = []
@@ -103,33 +147,39 @@ class PhaseProjection(nn.Module):
 
     def shiftmap_v2f(self, shiftmap):
         """
-        shiftmap: (n_valid_views,m,n,2)
+        Convert shiftmap from valid views to full size
 
-        return: shiftmap_full, (n_view_x,n_view_y,m,n,2)
+        Parameters:
+            shiftmap: torch.Tensor, (n_valid_views,m,n,2)
+
+        Return:
+            shiftmap_full: torch.Tensor, (n_view_x,n_view_y,m,n,2)
         """
         return shiftmap_convertor_validviews2fullsize(shiftmap, self.mask, self.valid_views)
     
     def shiftmap_f2v(self, shiftmap_full):
         """
-        shiftmap_full: (n_view_x,n_view_y,m,n,2)
+        Convert shiftmap from full size to valid views
 
-        return: shiftmap, (n_valid_views,m,n,2)
+        Parameters:
+            shiftmap_full: torch.Tensor, (n_view_x,n_view_y,m,n,2)
+        
+        Return:
+            shiftmap: torch.Tensor, (n_valid_views,m,n,2)
         """
         return shiftmap_convertor_fullsize2validviews(shiftmap_full, self.mask, self.valid_views)
     
     def train(self, data_path, epoch=None, lr=None, batch_size=None, valid=None, split=None):
         """
-        data_path: str, path to data, should contain *_slope.mat and corresponding *_zernike.mat
+        Train model
 
-        epoch: int, number of epochs to train, if None, use self.epoch
-        
-        lr: float, learning rate, if None, use self.lr
-        
-        batch_size: int, batch size, if None, use self.batch_size
-
-        valid: whether to split training set into training and validation set, if None, use self.valid
-
-        split: float, ratio of training set to the whole dataset, only valid when valid is True, if None, use self.split
+        Parameters:
+            data_path: str, path to data, should contain *_slope.mat and corresponding *_zernike.mat
+            lr: float, learning rate, if None, use self.lr
+            epoch: int, number of epochs to train, if None, use self.epoch
+            batch_size: int, batch size, if None, use self.batch_size
+            valid: whether to split training set into training and validation set, if None, use self.valid
+            split: float, ratio of training set to the whole dataset, only valid when valid is True, if None, use self.split
         """
         if epoch is None:
             epoch = self.epoch
@@ -236,7 +286,10 @@ class PhaseProjection(nn.Module):
 
     def test(self, data_path):
         """
-        data_path: str, path to data, should contain *_slope.mat and corresponding *_zernike.mat
+        Evaluate model on test set
+
+        Parameters:
+            data_path: str, path to data, should contain *_slope.mat and corresponding *_zernike.mat
         """
         # files
         slope_files = glob.glob(data_path + "*_slope.mat")
@@ -277,9 +330,13 @@ class PhaseProjection(nn.Module):
 
     def inference(self, data_path):
         """
-        data_path: str, path to data, should contain *_slope.mat
+        Inference zernike polynomials from slope
 
-        save coresponding zernike to *_pp_zernike.mat
+        Parameters:
+            data_path: str, path to data, should contain *_slope.mat
+        
+        Result:
+            save coresponding zernike to *_pp_zernike.mat
         """
         # files
         slope_files = glob.glob(data_path + "*_slope.mat")
@@ -297,7 +354,10 @@ class PhaseProjection(nn.Module):
 
     def save(self, path):
         """
-        path: str, path to save model
+        Save model to "path/pp_ckpt_%d.pkl" % (epoch)
+
+        Parameters:
+            path: str, path to save model
         """
         if not op.exists(path):
             os.makedirs(path)
@@ -314,11 +374,12 @@ class PhaseProjection(nn.Module):
     
     def load(self, path, epoch, model_only=False):
         """
-        path: str, path to load model
+        Load model from "path/pp_ckpt_%d.pkl" % (epoch)
 
-        epoch: int, epoch to load
-
-        model_only: bool, whether to load only model
+        Parameters:
+            path: str, path to load model
+            epoch: int, epoch to load
+            model_only: bool, whether to load only model
         """
         ckpt_path = path + "pp_ckpt_%d.pkl" % (epoch)
         if not op.exists(ckpt_path):

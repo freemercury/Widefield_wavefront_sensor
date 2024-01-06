@@ -11,9 +11,14 @@ import numpy as np
 
 def get_avg_interp(phantom, pooling_size=[1,1]):
     """
-    phantom: (b,1,h,w)
+    Return average interpolation of phantom
 
-    return: norm_phantom, (b,1,h,w) or (b,1,1,1) if pooling_size == [1,1]
+    Parameters:
+        phantom: torch.Tensor, (b,1,h,w)
+        pooling_size: tuple of int, (h,w)
+    
+    Return:
+        norm_phantom: torch.Tensor, (b,1,h,w) or (b,1,1,1) if pooling_size == [1,1]
     """
     assert len(pooling_size) == 2
     assert pooling_size[0] >= 1 and pooling_size[1] >= 1
@@ -30,9 +35,15 @@ def get_avg_interp(phantom, pooling_size=[1,1]):
 
 def get_gaussian_blur(phantom, kernel_size=21, sigma=3):
     """
-    phantom: (b,1,h,w)
+    Get gaussian blur of phantom
 
-    return: norm_phantom (b,1,h,w)
+    Parameters:
+        phantom: torch.Tensor, (b,1,h,w)
+        kernel_size: int
+        sigma: float
+
+    Return:
+        norm_phantom: torch.Tensor, (b,1,h,w)
     """
     # gaussian kernel
     x = np.arange(-kernel_size // 2 + 1, kernel_size // 2 + 1, dtype=np.float32)
@@ -50,10 +61,14 @@ def get_gaussian_blur(phantom, kernel_size=21, sigma=3):
 
 def get_mask(mask_path="./data/settings/mask.mat"):
     """
-    return:
-        mask: (n_view_x,n_view_y)
+    Get mask and valid views
 
-        valid_views: list of index of valid views
+    Parameters:
+        mask_path: str
+    
+    Return:
+        mask: torch.Tensor, (n_view_x,n_view_y)
+        valid_views: List[int], list of index of valid views
     """
     data_dict = io.loadmat(mask_path) 
 
@@ -66,13 +81,15 @@ def get_mask(mask_path="./data/settings/mask.mat"):
 
 def shiftmap_convertor_validviews2fullsize(shiftmap, mask, valid_views):
     """
-    shiftmap: (n_valid_views,m,n,2)
+    Convert shiftmap from valid views to full size
 
-    mask: (n_view_x,n_view_y)
-    
-    valid_views: list of index of valid views
+    Parameters:
+        shiftmap: torch.Tensor, (n_valid_views,m,n,2)
+        mask: torch.Tensor, (n_view_x,n_view_y)
+        valid_views: List[int], list of index of valid views
 
-    return: shiftmap_full, (n_view_x,n_view_y,m,n,2)
+    Return:
+        shiftmap_full: torch.Tensor, (n_view_x,n_view_y,m,n,2)
     """
     n_view_x, n_view_y = mask.shape[0:2]
     n_valid_views, m, n, c = shiftmap.shape
@@ -84,13 +101,15 @@ def shiftmap_convertor_validviews2fullsize(shiftmap, mask, valid_views):
 
 def shiftmap_convertor_fullsize2validviews(shiftmap_full, mask, valid_views):
     """
-    shiftmap_full: (n_view_x,n_view_y,m,n,2)
+    Convert shiftmap from full size to valid views
 
-    mask: (n_views,n_views)
+    Parameters:
+        shiftmap_full: torch.Tensor, (n_view_x,n_view_y,m,n,2)
+        mask: torch.Tensor, (n_view_x,n_view_y)
+        valid_views: List[int], list of index of valid views
     
-    valid_views: list of index of valid views
-
-    return: shiftmap, (n_valid_views,m,n,2)
+    Return:
+        shiftmap: torch.Tensor, (n_valid_views,m,n,2)
     """
     n_view_x, n_view_y = mask.shape[0:2]
     _, _, m, n, c = shiftmap_full.shape
