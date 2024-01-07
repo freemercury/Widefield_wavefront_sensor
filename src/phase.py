@@ -59,7 +59,7 @@ def slope2zernike():
     if not op.exists(args["mask_path"]):
         args["mask_path"] = None
     if not op.exists(args["data_path"]):
-        raise Exception("realign data path not exist!")
+        raise Exception("data path not exist!")
     Helper.save_json(args, args["data_path"] + "phase_args_" + Helper.get_timestamp() + ".json")
     Helper.makedirs(args["ckpt_path"])
 

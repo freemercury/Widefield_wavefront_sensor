@@ -340,7 +340,7 @@ class PhaseProjection(nn.Module):
         """
         # files
         slope_files = glob.glob(data_path + "*_slope.mat")
-        zernike_files = [file.replace("_slope.mat", "_pp_zernike.mat") for file in slope_files]
+        zernike_files = [file.replace("_slope.mat", "_mlp_zernike.mat") for file in slope_files]
 
         # inference
         for slope_file, zernike_file in zip(slope_files, zernike_files):
