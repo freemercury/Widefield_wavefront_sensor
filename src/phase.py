@@ -5,7 +5,7 @@ from scipy import io
 
 
 DATA_PATH = "./data/phase_data/230407/set2/"
-CKPT_PATH = "./data/settings/"
+CKPT_PATH = "./data/log/mlp/"
 MASK_PATH = "./data/settings/mask.mat"
 JOB = "infer"  # "train" or "test" or "infer"
 GPU_ID = 0  # set to None for cpu

@@ -54,7 +54,7 @@ clear; clc;
 
 % config
 save_path = 'E:\Project\Widefield_wavefront_sensor\data\settings';
-phase_size = 75;
+phase_size = 15;
 desired_indices = 1:35; % zernike orders (Noll)
 n_zernike = length(desired_indices);
 

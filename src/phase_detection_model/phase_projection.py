@@ -58,9 +58,9 @@ class PhaseProjection(nn.Module):
 
     inference: inference zernike polynomials from slope
 
-    save: save model to "path/pp_ckpt_%d.pkl" % (epoch)
+    save: save model to "path/mlp_ckpt_%d.pkl" % (epoch)
 
-    load: load model from "path/pp_ckpt_%d.pkl" % (epoch)
+    load: load model from "path/mlp_ckpt_%d.pkl" % (epoch)
 
     """
     def __init__(self, device, hidden_size, num_zernike, mask_size, mask_path, epoch=10, lr=1e-4, batch_size=128, valid=True, split=0.9):
@@ -354,7 +354,7 @@ class PhaseProjection(nn.Module):
 
     def save(self, path):
         """
-        Save model to "path/pp_ckpt_%d.pkl" % (epoch)
+        Save model to "path/mlp_ckpt_%d.pkl" % (epoch)
 
         Parameters:
             path: str, path to save model
@@ -369,19 +369,19 @@ class PhaseProjection(nn.Module):
                     "loss": self.loss,
                     "epoch_list": self.epoch_list,
                     "R2_train": self.R2_train,
-                    "R2_valid": self.R2_valid}, path + "pp_ckpt_%d.pkl" % (self.epoch_list[-1]))
-        print("Saved model to %s" % (path + "pp_ckpt_%d.pkl" % (self.epoch_list[-1])))
+                    "R2_valid": self.R2_valid}, path + "mlp_ckpt_%d.pkl" % (self.epoch_list[-1]))
+        print("Saved model to %s" % (path + "mlp_ckpt_%d.pkl" % (self.epoch_list[-1])))
     
     def load(self, path, epoch, model_only=False):
         """
-        Load model from "path/pp_ckpt_%d.pkl" % (epoch)
+        Load model from "path/mlp_ckpt_%d.pkl" % (epoch)
 
         Parameters:
             path: str, path to load model
             epoch: int, epoch to load
             model_only: bool, whether to load only model
         """
-        ckpt_path = path + "pp_ckpt_%d.pkl" % (epoch)
+        ckpt_path = path + "mlp_ckpt_%d.pkl" % (epoch)
         if not op.exists(ckpt_path):
             raise Exception("ckpt not exist!")
         ckpt = torch.load(ckpt_path)
