@@ -21,7 +21,7 @@ class Helper():
 
     path: is_path_exist, makedirs, get_timestamp
 
-    file i/o: read_json, save_json, read_txt, read_txt_lines, save_txt
+    file i/o: read_json, save_json, read_txt, read_txt_lines, save_txt, log_txt
 
     image i/o: tif_read_img, tif_save_img
     
@@ -227,6 +227,22 @@ class Helper():
         with open(txtpath, 'w') as f:
             f.write(txt)
         return True
+    
+    @classmethod
+    def log_txt(cls, logstr, logpath):
+        """
+        Log string to txt file
+        
+        Parameters:
+            logstr: str, log string
+            logpath: str, log file path
+        """
+        if not op.exists(logpath):
+            with open(logpath, 'w') as f:
+                f.write(logstr)
+        else:
+            with open(logpath, 'a') as f:
+                f.write(logstr)
     #endregion
 
     #region IMAGE_IO
@@ -329,7 +345,7 @@ class Helper():
         with Plot(dpi=dpi, save_name=save_name, show_grid=False, show_box=False, show_axis=show_axis,
                          transparent=transparent, show_legend=False, show_colorbar=show_colorbar, caxis=caxis,
                          save=save, close=close, **kwargs):
-            plt.imshow(img, cmap=cmap)
+            plt.imshow(img / 2 / np.pi * 525, cmap=cmap)
     #endregion
 
 

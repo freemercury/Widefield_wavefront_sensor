@@ -3,7 +3,7 @@ from phase_detection_model import PhaseProjection
 import argparse
 from scipy import io
 import glob
-
+from tqdm import tqdm
 
 DATA_PATH = "./data/phase_data/230407/set2/"
 CKPT_PATH = "./data/log/mlp/"
@@ -25,7 +25,7 @@ SPLIT = 0.9 # train / (train + valid) split ratio
 def parse_args():
     parser = argparse.ArgumentParser(description='Phase Projection Arguments')
     parser.add_argument('--data_path', default=DATA_PATH, type=str, help='data path')
-    parser.add_argument('--job', default=JOB, type=str, help='job type, "train" or "test" or "infer" or "remove_sys"')
+    parser.add_argument('--job', default=JOB, type=str, help='job type, "train" or "test" or "infer" or "remove_sys" or "draw"')
     parser.add_argument('--ckpt_path', default=CKPT_PATH, type=str, help='checkpoint path')
     parser.add_argument('--mask_path', default=MASK_PATH, type=str, help='mask path')
     parser.add_argument('--phase_zernike_path', default=PHASE_ZERNIKE_PATH, type=str, help='phase zernike path')
@@ -111,10 +111,24 @@ def slope2zernike():
         Z2P = torch.from_numpy(trans_dict["Z2P"]).type(torch.float32)
         # plot mean zernike
         Helper.plot_phase_img([mean_zernike, Z2P], cmap="coolwarm", save_name=args["data_path"] + "/sys_abr.png")
+    elif args["job"] == "draw":
+        # load zernike_phase
+        trans_dict = io.loadmat(args["phase_zernike_path"].replace("55", str(args["phase_size"])))
+        Z2P = torch.from_numpy(trans_dict["Z2P"]).type(torch.float32)
+        # file list
+        file_list = glob.glob(args["data_path"] + "/**/*_ds_zernike.mat", recursive=True)
+        # plot
+        for filename in tqdm(file_list):
+            path = "/".join(filename.replace("\\", "/").split("/")[:-1])
+            Helper.makedirs(path + "/draw/")
+            zernike = torch.from_numpy(io.loadmat(filename)["zernike"]).type(torch.float32)
+            Helper.plot_phase_img([zernike, Z2P], cmap="coolwarm", caxis=[-525, 525],  
+                                  save_name=path + "/draw/" + filename.split("/")[-1].replace("_ds_zernike.mat", "_ds_phase.png"))
     else:
         raise Exception("job type error!")
 
 
 
 if __name__ == "__main__":
-    slope2zernike()
+    # slope2zernike()
+    print(".data/ada\\afw\\asf/".replace("\\", "/"))

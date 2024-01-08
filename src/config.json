@@ -1,30 +1,46 @@
-[
-    {
-        "info": {
-            "name": "1_re_o1_17t7t7", "job_type": "final_run1", "group": "old20", "project": "LFM", 
-            "best_epoch": 197, "pre_name": null, "pre_epoch": -1
-        },
-        "model": {
-            "n_dim": [[32,128,128],[128,32,32,32,32,32]], "kernel_size": [[5,5],[3,3,3,3,3]], "dropout": 0.2,
-            "backbone": "rc", "head": "hw", "pos_enc": null, "pad_type": null, "ext_size": [32,64],
-            "extractor": null, "encoder_name": "resnet18", "encoder_weights": "imagenet", "decoder_attention_type": null
-        },
-        "optim": {"lr": 3e-4, "weight_decay": 5e-4},
-        "scheduler": {"eta_min": 3e-5},
-        "criterion": {"loss_type": "l1", "reduction": "mean", "loss_data_type": "phase", "t_loss": [0,1,2,3,4], "factor": 1.0},
-        "metric": {"t_metric": [4], "factor": 1.0},
-        "dataset": {
-            "data_path": "./data/pred_data_new/zernike0407/", "data_param_path": "./data/pred_data_new/pred_data_param/", "data_type": "zernike",
-            "mean_type": "patch", "norm_type": "minimax_all", "norm_sets": [21,20,23,27,22,18], "phase_size": 15, "n_channel": [3,34],
-            "train_sets": [21,20,23,27,22,18], "train_metas": [900,900,900,900,900,900],
-            "test_sets": [21,20,23,27,22,18], "test_metas": [-100,-100,-100,-100,-100,-100],
-            "t_series": 5, "t_offset": 1, "t_down": 0,
-            "all_patch":[0,19,0,25], "input_patch":[0,17,7,24], "target_patch":[5,12,12,19], "test_size": [7,7]
-        },
-        "config": {
-            "device_id": 0, "seed": 42, "batch_size": 32, "time_stamp": false, "wandb": false,
-            "epoch": 200, "virtual_epoch":200, "warmup_epoch": 5, "continue": -1,
-            "save_epoch": 1, "eval_epoch": 1, "plot_epoch": 1, "commit_epoch": [1,5]
-        }
+{
+    "info": {
+        "name": "17t7"
+    },
+    "model": {
+        "n_dim": [[32,128,128],[128,32,32,32,32,32]], 
+        "kernel_size": [[5,5],[3,3,3,3,3]], 
+        "dropout": 0.2
+    },
+    "optim": {
+        "lr": 3e-4, 
+        "weight_decay": 5e-4
+    },
+    "scheduler": {
+        "eta_min": 3e-5
+    },
+    "criterion": {
+        "loss_type": "l1", 
+        "reduction": "mean"
+    },
+    "dataset": {
+        "data_path": "./data/phase_data/230407/", 
+        "zernike_phase_path": "./data/settings/",
+        "phase_size": 15, 
+        "n_channel": [3,34], 
+        "split": 0.9, 
+        "t_series": 5, 
+        "t_offset": 1, 
+        "t_down": 0,
+        "all_patch":[0,19,0,25], 
+        "input_patch":[0,17,7,24], 
+        "target_patch":[5,12,12,19], 
+        "test_size": [7,7]
+    },
+    "config": {
+        "device_id": 0, 
+        "seed": 42, 
+        "batch_size": 32,
+        "epoch": 200, 
+        "virtual_epoch":200, 
+        "warmup_epoch": 5,
+        "save_epoch": 1, 
+        "eval_epoch": 1, 
+        "plot_epoch": 1
     }
-]
+}
