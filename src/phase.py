@@ -2,12 +2,15 @@ from helper import *
 from phase_detection_model import PhaseProjection
 import argparse
 from scipy import io
+import glob
 
 
 DATA_PATH = "./data/phase_data/230407/set2/"
 CKPT_PATH = "./data/log/mlp/"
 MASK_PATH = "./data/settings/mask.mat"
-JOB = "infer"  # "train" or "test" or "infer"
+PHASE_ZERNIKE_PATH = "./data/settings/zernike_phase55.mat"
+PHASE_SIZE = 55
+JOB = "infer"  # "train" or "test" or "infer" or "remove_sys" or "draw"
 GPU_ID = 0  # set to None for cpu
 MASK_SIZE = [15,15]
 HIDDEN_SIZE = [300,500] # hidden layer size of mlp
@@ -22,9 +25,11 @@ SPLIT = 0.9 # train / (train + valid) split ratio
 def parse_args():
     parser = argparse.ArgumentParser(description='Phase Projection Arguments')
     parser.add_argument('--data_path', default=DATA_PATH, type=str, help='data path')
-    parser.add_argument('--job', default=JOB, type=str, help='job type, "train" or "test" or "infer"')
+    parser.add_argument('--job', default=JOB, type=str, help='job type, "train" or "test" or "infer" or "remove_sys"')
     parser.add_argument('--ckpt_path', default=CKPT_PATH, type=str, help='checkpoint path')
     parser.add_argument('--mask_path', default=MASK_PATH, type=str, help='mask path')
+    parser.add_argument('--phase_zernike_path', default=PHASE_ZERNIKE_PATH, type=str, help='phase zernike path')
+    parser.add_argument('--phase_size', default=PHASE_SIZE, type=int, help='phase size')
     parser.add_argument('--gpu_id', default=GPU_ID, type=int, help='gpu id, -1 for cpu')
     parser.add_argument('--mask_size', default=MASK_SIZE, type=str, help='mask size (h,w)')
     parser.add_argument('--hidden_size', default=HIDDEN_SIZE, type=str, help='hidden layer size of mlp')
@@ -60,7 +65,7 @@ def slope2zernike():
         args["mask_path"] = None
     if not op.exists(args["data_path"]):
         raise Exception("data path not exist!")
-    Helper.save_json(args, args["data_path"] + "phase_args_" + Helper.get_timestamp() + ".json")
+    Helper.save_json(args, args["data_path"] + "/phase_args_" + Helper.get_timestamp() + ".json")
     Helper.makedirs(args["ckpt_path"])
 
     # initialize model
@@ -85,6 +90,27 @@ def slope2zernike():
     elif args["job"] == "infer":
         model.load(args["ckpt_path"], epoch=args["epoch"] - 1)
         model.inference(args["data_path"])
+    elif args["job"] == "remove_sys":
+        # load data
+        file_list1 = glob.glob(args["data_path"] + "/**/*_zernike.mat", recursive=True)
+        file_list = []
+        for filename in file_list1:
+            if "mlp" in filename:
+                file_list.append(filename)
+            elif filename.replace("_zernike.mat", "_mlp_zenrike.mat") not in file_list1:
+                file_list.append(filename)
+        all_zernike = torch.stack([torch.from_numpy(io.loadmat(file)["zernike"]).type(torch.float32) for file in file_list], dim=0) # (n,c,h,w)
+        mean_zernike = torch.mean(all_zernike, dim=0) # (c,h,w)
+        for filename in file_list:
+            zernike = torch.from_numpy(io.loadmat(filename)["zernike"]).type(torch.float32)
+            zernike -= mean_zernike
+            savename = filename.replace("_mlp_","_").replace("_zernike.mat", "_ds_zenrike.mat")
+            io.savemat(savename, {"zernike": zernike.numpy()})
+        # load zernike_phase
+        trans_dict = io.loadmat(args["phase_zernike_path"].replace("55", str(args["phase_size"])))
+        Z2P = torch.from_numpy(trans_dict["Z2P"]).type(torch.float32)
+        # plot mean zernike
+        Helper.plot_phase_img([mean_zernike, Z2P], cmap="coolwarm", save_name=args["data_path"] + "/sys_abr.png")
     else:
         raise Exception("job type error!")
 

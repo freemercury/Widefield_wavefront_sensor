@@ -194,7 +194,7 @@ class PhaseProjection(nn.Module):
         self.reset_model()
 
         # files
-        slope_files = glob.glob(data_path + "*_slope.mat")
+        slope_files = glob.glob(data_path + "/**/*_slope.mat", recursive=True)
         zernike_files = [file.replace("_slope.mat", "_zernike.mat") for file in slope_files]
 
         # load data    
@@ -292,7 +292,7 @@ class PhaseProjection(nn.Module):
             data_path: str, path to data, should contain *_slope.mat and corresponding *_zernike.mat
         """
         # files
-        slope_files = glob.glob(data_path + "*_slope.mat")
+        slope_files = glob.glob(data_path + "/**/*_slope.mat")
         zernike_files = [file.replace("_slope.mat", "_zernike.mat") for file in slope_files]
 
         # load data    
@@ -339,7 +339,7 @@ class PhaseProjection(nn.Module):
             save coresponding zernike to *_pp_zernike.mat
         """
         # files
-        slope_files = glob.glob(data_path + "*_slope.mat")
+        slope_files = glob.glob(data_path + "/**/*_slope.mat", recursive=True)
         zernike_files = [file.replace("_slope.mat", "_mlp_zernike.mat") for file in slope_files]
 
         # inference
@@ -369,7 +369,7 @@ class PhaseProjection(nn.Module):
                     "loss": self.loss,
                     "epoch_list": self.epoch_list,
                     "R2_train": self.R2_train,
-                    "R2_valid": self.R2_valid}, path + "mlp_ckpt_%d.pkl" % (self.epoch_list[-1]))
+                    "R2_valid": self.R2_valid}, path + "/mlp_ckpt_%d.pkl" % (self.epoch_list[-1]))
         print("Saved model to %s" % (path + "mlp_ckpt_%d.pkl" % (self.epoch_list[-1])))
     
     def load(self, path, epoch, model_only=False):
@@ -381,7 +381,7 @@ class PhaseProjection(nn.Module):
             epoch: int, epoch to load
             model_only: bool, whether to load only model
         """
-        ckpt_path = path + "mlp_ckpt_%d.pkl" % (epoch)
+        ckpt_path = path + "/mlp_ckpt_%d.pkl" % (epoch)
         if not op.exists(ckpt_path):
             raise Exception("ckpt not exist!")
         ckpt = torch.load(ckpt_path)

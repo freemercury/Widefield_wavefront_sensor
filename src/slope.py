@@ -85,8 +85,8 @@ def img2slope():
     if not op.exists(args["realign_data_path"]):
         raise Exception("realign data path not exist!")
     Helper.makedirs(args["phase_data_path"])
-    Helper.save_json(args, args["phase_data_path"] + "slope_args_" + Helper.get_timestamp() + ".json")
-    realign_data_files = glob.glob(args["realign_data_path"] + "*.tif")
+    Helper.save_json(args, args["phase_data_path"] + "/slope_args_" + Helper.get_timestamp() + ".json")
+    realign_data_files = glob.glob(args["realign_data_path"] + "/**/*.tif", recursive=True)
 
     # initialize model
     model = SlopeEstimation(device=device,
@@ -111,7 +111,7 @@ def img2slope():
         model.set_phantom(phantom, args["ref_view_id"])
         model.reset_shiftmap_models()
         model.train()
-        io.savemat(args["phase_data_path"] + file.split("\\")[-1].replace(".tif", "_slope.mat"), 
+        io.savemat(args["phase_data_path"] + "/" + file.split("\\")[-1].replace(".tif", "_slope.mat"), 
                    {"slope": model.get_shiftmap(scaling=True).cpu().numpy()})
         
         # debug
@@ -120,7 +120,7 @@ def img2slope():
             epoch_list, loss_list = model.get_loss_curve_shiftmap()
             plt.figure()
             plt.plot(epoch_list, loss_list)
-            plt.savefig(args["phase_data_path"] + file.split("\\")[-1].replace(".tif", "_slope_loss.png"))
+            plt.savefig(args["phase_data_path"] + "/" + file.split("\\")[-1].replace(".tif", "_slope_loss.png"))
             plt.close()
             # save warped img
             input_phantom, warped_phantom, target_phantom, _, __build_class__, test_views = model.get_warped_phantom(args["test_views"])
@@ -128,7 +128,7 @@ def img2slope():
                 save_img = torch.stack([input_phantom[i,:,:,:], warped_phantom[i,:,:,:],
                                         target_phantom[i,:,:,:]], dim=0).permute(0,2,3,1)
                 Helper.tif_save_img(save_img, 
-                                    args["phase_data_path"] + file.split("\\")[-1].replace(".tif", "_slope_view%d.png"%(test_view)),
+                                    args["phase_data_path"] + "/" + file.split("\\")[-1].replace(".tif", "_slope_view%d.png"%(test_view)),
                                     save_type="float32")
 
 

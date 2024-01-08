@@ -211,3 +211,15 @@ class ResConvLSTM(nn.Module):
             input_data = torch.stack([self.conv[cell_num](input_data[:,t,:,:,:]) for t in range(input_data.shape[1])], dim=1)
             input_data = output + input_data
         return input_data
+    
+
+class PhasePredictionModel(nn.Module)
+
+
+if __name__ == "__main__":
+    # model = ResConvLSTM(n_dim=[[32,128,32],[32,128,32]], kernel_size=[[5,3],[5,3]], dropout=0.2)
+    # print(model)
+    # input_data = torch.randn(2,10,32,12,14)
+    # output_data = model(input_data)
+    # print(output_data.shape)
+    print("Done!")
