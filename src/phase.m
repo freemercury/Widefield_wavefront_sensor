@@ -2,8 +2,8 @@
 clear; clc;
 
 % config
-data_path = 'E:\Project\Widefield_wavefront_sensor\data\phase_data\230407\set1';
-mask_path = 'E:\Project\Widefield_wavefront_sensor\data\settings\mask.mat';
+data_path = '..\data\phase_data\230408\set1';
+mask_path = '..\data\settings\mask.mat';
 desired_indices = 1:35; % zernike orders (Noll)
 crop_bound = 1;     % remove the outermost band (width = crop_bound)
 expand = 3;         % used in nearest up-sampling
@@ -53,7 +53,7 @@ end
 clear; clc;
 
 % config
-save_path = 'E:\Project\Widefield_wavefront_sensor\data\settings';
+save_path = '..\data\settings';
 phase_size = 15;
 desired_indices = 1:35; % zernike orders (Noll)
 n_zernike = length(desired_indices);

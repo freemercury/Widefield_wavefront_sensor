@@ -170,16 +170,20 @@ class ZernikeDataset(Dataset):
         for set_id, set_name in enumerate(set_list):
             set_path = data_path + "/" + set_name + "/"
             file_list = glob.glob(set_path + "/**/*_ds_zernike.mat", recursive=True)
-            file_list.sort(key=lambda x: extract_number(x.split("\\")[-1], r'.*?(\d+).*?'))
-            tmp_data = torch.stack([torch.from_numpy(loadmat(file)["zernike"]).type(torch.float32).to(device)[n_channel,:,:] for file in file_list], dim=0)
-            cls.data_list.append(tmp_data)
-            cls.file_list.append(file_list)
-            train_len = int(len(file_list) * split)
-            cls.train_id_list += [(set_id, i) for i in range(train_len - seq_len + 1)]
-            cls.test_id_list += [(set_id, i) for i in range(train_len - seq_len + 1, len(file_list) - seq_len + 1)]
+            if len(file_list) != 0:
+                file_list.sort(key=lambda x: extract_number(x.split("\\")[-1], r'.*?(\d+).*?'))
+                tmp_data = torch.stack([torch.from_numpy(loadmat(file)["zernike"]).type(torch.float32).to(device)[n_channel,:,:] for file in file_list], dim=0)
+                cls.data_list.append(tmp_data)
+                cls.file_list.append(file_list)
+                train_len = int(len(file_list) * split)
+                cls.train_id_list += [(set_id, i) for i in range(train_len - seq_len + 1)]
+                cls.test_id_list += [(set_id, i) for i in range(train_len - seq_len + 1, len(file_list) - seq_len + 1)]
+            else:
+                cls.data_list.append(None)
+                cls.file_list.append(None)
         
         # update norm
-        cls.norm = torch.amax(torch.abs(torch.cat(cls.data_list, dim=0))).item()
+        cls.norm = torch.amax(torch.abs(torch.cat([x for x in cls.data_list if x is not None], dim=0))).item()
 
     @classmethod
     def zernike2phase(cls, zernike_data):
@@ -279,7 +283,7 @@ class PhaseMetric(nn.Module):
             target: torch.Tensor, (b,t,c,h',w')
             scalar: True return single scalar, otherwise return (ts,ts), here ts means test_size
         """
-        pred = ZernikeDataset.zernike2phase(pred[:,-1,:,:,:].unsuqeeze(1))
+        pred = ZernikeDataset.zernike2phase(pred[:,-1,:,:,:].unsqueeze(1))
         target = ZernikeDataset.zernike2phase(target[:,-1,:,:,:].unsqueeze(1))
         b, t, p, h, w = pred.shape
 

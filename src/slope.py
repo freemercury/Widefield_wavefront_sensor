@@ -7,11 +7,10 @@ from tqdm import tqdm
 from matplotlib import pyplot as plt
 
 
-REALIGN_DATA_PATH = "./data/realign_data/230407/set1/"
-PHASE_DATA_PATH = "./data/phase_data/230407/set1/"
+REALIGN_DATA_PATH = "./data/realign_data/230408/set1/"
+PHASE_DATA_PATH = "./data/phase_data/230408/set1/"
 MASK_PATH = "./data/settings/mask.mat"
 GPU_ID = 0  # set to None for cpu
-DEBUG = False # whether to save warped images and loss curve
 TEST_VIEWS = [6,19,52,91,115,168,175,187,217]   # index in [0, n_view_x*n_view_y-1]
 MASK_SIZE = [15,15] # [h,w]
 IMG_SIZE = [381,501]    # [h,w]
@@ -35,7 +34,7 @@ def parse_args():
     parser.add_argument('--phase_data_path', default=PHASE_DATA_PATH, type=str, help='phase data path')
     parser.add_argument('--mask_path', default=MASK_PATH, type=str, help='mask path')
     parser.add_argument('--gpu_id', default=GPU_ID, type=int, help='gpu id, -1 for cpu')
-    parser.add_argument('--debug', default=DEBUG, type=bool, help='whether to save warped images and loss curve')
+    parser.add_argument('--debug', action='store_true', help='save warped images and loss curve, default False')
     parser.add_argument('--test_views', default=TEST_VIEWS, type=str, help='test views')
     parser.add_argument('--mask_size', default=MASK_SIZE, type=str, help='mask size (h,w)')
     parser.add_argument('--img_size', default=IMG_SIZE, type=str, help='image size (h,w)')
@@ -85,7 +84,8 @@ def img2slope():
     if not op.exists(args["realign_data_path"]):
         raise Exception("realign data path not exist!")
     Helper.makedirs(args["phase_data_path"])
-    Helper.save_json(args, args["phase_data_path"] + "/slope_args_" + Helper.get_timestamp() + ".json")
+    Helper.makedirs("./log/args/")
+    Helper.save_json(args, "./log/args/slope_args_" + Helper.get_timestamp() + ".json")
     realign_data_files = glob.glob(args["realign_data_path"] + "/**/*.tif", recursive=True)
 
     # initialize model

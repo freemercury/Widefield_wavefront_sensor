@@ -386,8 +386,8 @@ class PhasePrediction(nn.Module):
     def load(self, epoch):
         ckpt_path = self.ckpt_path_gen(epoch)
         if not op.exists(ckpt_path):
-            log_string = 'No checkpoint found at {}\n'.format(ckpt_path)
-            log_txt(log_string, self.root + "log.txt")
+            log_string = 'No checkpoint found at {}'.format(ckpt_path)
+            log_txt(log_string + "\n", self.root + "log.txt")
             tqdm.write(log_string)
             return False
         
@@ -412,8 +412,8 @@ class PhasePrediction(nn.Module):
         self.optimizer.load_state_dict(checkpoint["optimizer"])
         self.scheduler.load_state_dict(checkpoint["scheduler"])
 
-        log_string = 'Loaded model from {}\n'.format(ckpt_path)
-        log_txt(log_string, self.root + "log.txt")
+        log_string = 'Loaded model from {}'.format(ckpt_path)
+        log_txt(log_string + "\n", self.root + "log.txt")
         tqdm.write(log_string)
         return True
     
@@ -425,8 +425,8 @@ class PhasePrediction(nn.Module):
                      "model": self.model.state_dict(), "optimizer": self.optimizer.state_dict(), "scheduler": self.scheduler.state_dict()}
         torch.save(save_dict, ckpt_path)
 
-        log_string = 'Saved model to {}\n'.format(ckpt_path)
-        log_txt(log_string, self.root + "log.txt")
+        log_string = 'Saved model to {}'.format(ckpt_path)
+        log_txt(log_string + "\n", self.root + "log.txt")
         tqdm.write(log_string)
         return True
     
@@ -470,20 +470,20 @@ class PhasePrediction(nn.Module):
             self.train_R2.append((self.epoch[-1], average_R2))
             self.train_rmse.append((self.epoch[-1], average_rmse))
             self.train_sigma.append((self.epoch[-1], average_sigma))
-            log_string = "epoch:{} - TRAIN R2:{:.4f} RMSE:{:.4f} SIGMA:{:.4f}\n".format(
+            log_string = "epoch:{} - TRAIN R2:{:.4f} RMSE:{:.4f} SIGMA:{:.4f}".format(
                           self.epoch[-1], average_R2, average_rmse, average_sigma)
             if log:
-                log_txt(log_string, self.root + "log.txt")
+                log_txt(log_string + "\n", self.root + "log.txt")
             tqdm.write(log_string)
 
         else:
             self.test_R2.append((self.epoch[-1], average_R2))
             self.test_rmse.append((self.epoch[-1], average_rmse))
             self.test_sigma.append((self.epoch[-1], average_sigma))
-            log_string = "epoch:{} - TEST  R2:{:.4f} RMSE:{:.4f} SIGMA:{:.4f}\n".format(
+            log_string = "epoch:{} - TEST  R2:{:.4f} RMSE:{:.4f} SIGMA:{:.4f}".format(
                           self.epoch[-1], average_R2, average_rmse, average_sigma)
             if log:
-                log_txt(log_string, self.root + "log.txt")
+                log_txt(log_string + "\n", self.root + "log.txt")
             tqdm.write(log_string)
 
     def delete_ckpt(self, n_epoch):
@@ -545,8 +545,8 @@ class PhasePrediction(nn.Module):
             best_epoch = find_best_epoch(self.test_sigma, "SIGMA", self.kwargs["config"]["save_epoch"], max_best=False)
         else:
             raise Exception("best_metric should be RMSE or R2 or SIGMA!")
-        log_string = "Found best epoch is %d by %s\n"%(best_epoch, best_metric)
-        log_txt(log_string, self.root + "log.txt")
+        log_string = "Found best epoch is %d by %s"%(best_epoch, best_metric)
+        log_txt(log_string + "\n", self.root + "log.txt")
         tqdm.write(log_string)
         self.load(best_epoch)
 
@@ -557,11 +557,11 @@ class PhasePrediction(nn.Module):
         makedirs(test_path + "/phase_image/")
 
         # eval model on test dataset
-        tqdm.write("Eval model on test dataset...\n")
+        tqdm.write("Eval model on test dataset...")
         self.eval(train=False, log=False)
 
         # plot averaged heatmap
-        tqdm.write("Plot averaged heatmap...\n")
+        tqdm.write("Plot averaged heatmap...")
         self.model.eval()
         test_size = self.kwargs["dataset"]["test_size"]
         with torch.no_grad():
@@ -609,7 +609,7 @@ class PhasePrediction(nn.Module):
 
         # save predicted zernike
         if save_test_zernike or plot_test_zernike:
-            tqdm.write("Save predicted zernike...\n")
+            tqdm.write("Save predicted zernike...")
             self.model.eval()
             for input, target, target_file in self.test_ds:
                 pred = self.model(input.unsqueeze(0)).squeeze(0)

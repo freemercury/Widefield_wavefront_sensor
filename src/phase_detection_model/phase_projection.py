@@ -281,7 +281,7 @@ class PhaseProjection(nn.Module):
                     Num += batch_x.shape[0]
                 self.R2_valid.append(R2_cum / Num)
             else:
-                self.R2_valid.append(self.R2_train[-1])
+                self.R2_valid.append(-1)
             tqdm.write("epoch %d, train R2: %.6f, valid R2: %.6f"%(epoch_id, self.R2_train[-1], self.R2_valid[-1]))
 
     def test(self, data_path):
@@ -292,7 +292,7 @@ class PhaseProjection(nn.Module):
             data_path: str, path to data, should contain *_slope.mat and corresponding *_zernike.mat
         """
         # files
-        slope_files = glob.glob(data_path + "/**/*_slope.mat")
+        slope_files = glob.glob(data_path + "/**/*_slope.mat", recursive=True)
         zernike_files = [file.replace("_slope.mat", "_zernike.mat") for file in slope_files]
 
         # load data    
@@ -348,7 +348,7 @@ class PhaseProjection(nn.Module):
             b, m, n, _ = slope.shape
             slope = slope.permute(1,2,3,0).reshape(m*n,2*b).to(self.device)
             slope_norm = (slope - self.X_mean) / self.X_std
-            zernike = self.model(slope_norm).reshape(m,n,self.num_zernike).permute(2,0,1).detach().cpu().numpy()
+            zernike = (self.model(slope_norm) * self.y_std + self.y_mean).reshape(m,n,self.num_zernike).permute(2,0,1).detach().cpu().numpy()
             io.savemat(zernike_file, {"zernike": zernike})
         print("inference done!\n")
 
