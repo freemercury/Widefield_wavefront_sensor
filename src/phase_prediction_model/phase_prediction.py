@@ -627,7 +627,7 @@ class PhasePrediction(nn.Module):
                             {"pred": pred[-1].detach().cpu().numpy(), "gt": target[-1].detach().cpu().numpy(), "R2": ret_dict["R2"].detach().cpu().numpy(),
                                 "RMSE": ret_dict["RMSE"].detach().cpu().numpy(), "SIGMA": ret_dict["SIGMA"].detach().cpu().numpy()})
                 if plot_test_zernike:
-                    plot_phase_img([pred[-1].detach().cpu(), Z2P.cpu()], cmap="coolwarm", caxis=[-525,525], dpi=150, 
+                    plot_phase_img([pred[-1].detach().cpu(), Z2P.cpu()], cmap="coolwarm", caxis=[-525,525], dpi=150,
                                     save_name=test_path + "/pred_phase_img/" + "_".join(target_file.replace("\\", "/").split("/")[-2:]).replace("_ds_zernike.mat", "_pred_phase.png"))
                     plot_phase_img([target[-1].detach().cpu(), Z2P.cpu()], cmap="coolwarm", caxis=[-525,525], dpi=150,
                                     save_name=test_path + "/gt_phase_img/" + "_".join(target_file.replace("\\", "/").split("/")[-2:]).replace("_ds_zernike.mat", "_gt_phase.png"))
