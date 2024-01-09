@@ -19,7 +19,7 @@
         "reduction": "mean"
     },
     "dataset": {
-        "data_path": "./data/phase_data/230407/", 
+        "data_path": "./data/phase_data/230408/", 
         "zernike_phase_path": "./data/settings/",
         "phase_size": 15, 
         "n_channel": [3,34], 

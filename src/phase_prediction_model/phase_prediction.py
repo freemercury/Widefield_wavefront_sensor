@@ -527,41 +527,44 @@ class PhasePrediction(nn.Module):
             if plot_metric:
                 if (epoch_id + 1) % self.kwargs['config']['plot_epoch'] == 0:
                     plot_loss_list(self.loss, self.root + 'fig/Loss.png', dpi=200, yaxis=None)
-                    plot_metric_list(self.train_R2, self.test_R2, "R2", self.root + 'fig/R2.png', dpi=200, yaxis=(0,1), max_best=True)
-                    plot_metric_list(self.train_rmse, self.test_rmse, "RMSE", self.root + 'fig/RMSE.png', dpi=200, yaxis=None, max_best=False)
-                    plot_metric_list(self.train_sigma, self.test_sigma, "SIGMA", self.root + 'fig/SIGMA.png', dpi=200, yaxis=None, max_best=False)
+                    if eval_model:
+                        plot_metric_list(self.train_R2, self.test_R2, "R2", self.root + 'fig/R2.png', dpi=200, yaxis=(0,1), max_best=True)
+                        plot_metric_list(self.train_rmse, self.test_rmse, "RMSE", self.root + 'fig/RMSE.png', dpi=200, yaxis=None, max_best=False)
+                        plot_metric_list(self.train_sigma, self.test_sigma, "SIGMA", self.root + 'fig/SIGMA.png', dpi=200, yaxis=None, max_best=False)
 
         if remove_ckpt:
             self.delete_ckpt(self.kwargs['config']['epoch'])
 
-    def test(self, phase_size=55, best_metric="RMSE", save_test_zernike=True, plot_test_zernike=True):
+    def test(self, phase_size=55, best_epoch=-1, best_metric="RMSE", save_test_zernike=True, plot_test_zernike=True):
         # find best epoch
-        self.load(self.kwargs['config']['epoch'] - 1)
-        if best_metric == "RMSE":
-            best_epoch = find_best_epoch(self.test_rmse, "RMSE", self.kwargs["config"]["save_epoch"], max_best=False)
-        elif best_metric == "R2":
-            best_epoch = find_best_epoch(self.test_R2, "R2", self.kwargs["config"]["save_epoch"], max_best=True)
-        elif best_metric == "SIGMA":
-            best_epoch = find_best_epoch(self.test_sigma, "SIGMA", self.kwargs["config"]["save_epoch"], max_best=False)
-        else:
-            raise Exception("best_metric should be RMSE or R2 or SIGMA!")
-        log_string = "Found best epoch is %d by %s"%(best_epoch, best_metric)
-        log_txt(log_string + "\n", self.root + "log.txt")
-        tqdm.write(log_string)
+        if best_epoch < 0:
+            self.load(self.kwargs['config']['epoch'] - 1)
+            if best_metric == "RMSE":
+                best_epoch = find_best_epoch(self.test_rmse, "RMSE", self.kwargs["config"]["save_epoch"], max_best=False)
+            elif best_metric == "R2":
+                best_epoch = find_best_epoch(self.test_R2, "R2", self.kwargs["config"]["save_epoch"], max_best=True)
+            elif best_metric == "SIGMA":
+                best_epoch = find_best_epoch(self.test_sigma, "SIGMA", self.kwargs["config"]["save_epoch"], max_best=False)
+            else:
+                raise Exception("best_metric should be RMSE or R2 or SIGMA!")
+            log_string = "Found best epoch is %d by %s"%(best_epoch, best_metric)
+            log_txt(log_string + "\n", self.root + "log.txt")
+            tqdm.write(log_string)
         self.load(best_epoch)
 
         # test path
-        test_path = self.root + "/test%d_ts%d/"%(self.kwargs["info"]["best_epoch"], self.kwargs["dataset"]["test_size"][0])
+        test_path = self.root + "/test%d_ts%d/"%(best_epoch, self.kwargs["dataset"]["test_size"][0])
         makedirs(test_path + "/heatmap/")
         makedirs(test_path + "/zernike/")
-        makedirs(test_path + "/phase_image/")
+        makedirs(test_path + "/gt_phase_img/")
+        makedirs(test_path + "/pred_phase_img/")
 
         # eval model on test dataset
-        tqdm.write("Eval model on test dataset...")
+        tqdm.write("\nEvaluate model on test dataset...")
         self.eval(train=False, log=False)
 
         # plot averaged heatmap
-        tqdm.write("Plot averaged heatmap...")
+        tqdm.write("\nPlot averaged heatmap...")
         self.model.eval()
         test_size = self.kwargs["dataset"]["test_size"]
         with torch.no_grad():
@@ -608,10 +611,15 @@ class PhasePrediction(nn.Module):
         plt.close()
 
         # save predicted zernike
+        if plot_test_zernike:
+            n_channel = list(range(self.kwargs["dataset"]["n_channel"][0], self.kwargs["dataset"]["n_channel"][1]+1))
+            trans_dict = io.loadmat(self.kwargs["dataset"]["zernike_phase_path"] + "/zernike_phase%d.mat" % (phase_size))
+            Z2P = torch.from_numpy(trans_dict["Z2P"]).type(torch.float32).to(self.device)[n_channel,:,:]
+
         if save_test_zernike or plot_test_zernike:
-            tqdm.write("Save predicted zernike...")
+            tqdm.write("\nSave predicted zernike...")
             self.model.eval()
-            for input, target, target_file in self.test_ds:
+            for input, target, target_file in tqdm(self.test_ds):
                 pred = self.model(input.unsqueeze(0)).squeeze(0)
                 ret_dict = self.metric(pred.unsqueeze(0), target.unsqueeze(0), scalar=False)
                 if save_test_zernike:
@@ -619,12 +627,10 @@ class PhasePrediction(nn.Module):
                             {"pred": pred[-1].detach().cpu().numpy(), "gt": target[-1].detach().cpu().numpy(), "R2": ret_dict["R2"].detach().cpu().numpy(),
                                 "RMSE": ret_dict["RMSE"].detach().cpu().numpy(), "SIGMA": ret_dict["SIGMA"].detach().cpu().numpy()})
                 if plot_test_zernike:
-                    n_channel = list(range(self.kwargs["dataset"]["n_channel"][0], self.kwargs["dataset"]["n_channel"][1]+1))
-                    trans_dict = io.loadmat(self.kwargs["dataset"]["zernike_phase_path"] + "/zernike_phase%d.mat" % (phase_size))
-                    Z2P = torch.from_numpy(trans_dict["Z2P"]).type(torch.float32).to(self.device)[n_channel,:,:]
-                    plot_phase_img([pred[-1].detach(), Z2P], cmap="coolwarm", caxis=[-525,525],
-                                    save_name=test_path + "/phase_image/" + "_".join(target_file.replace("\\", "/").split("/")[-2:]).replace("_ds_zernike.mat", "_pred_phase.png"))
-                    plot_phase_img([target[-1].detach(), Z2P], cmap="coolwarm", caxis=[-525,525],
-                                    save_name=test_path + "/phase_image/" + "_".join(target_file.replace("\\", "/").split("/")[-2:]).replace("_ds_zernike.mat", "_gt_phase.png"))
+                    plot_phase_img([pred[-1].detach().cpu(), Z2P.cpu()], cmap="coolwarm", caxis=[-525,525], dpi=150, 
+                                    save_name=test_path + "/pred_phase_img/" + "_".join(target_file.replace("\\", "/").split("/")[-2:]).replace("_ds_zernike.mat", "_pred_phase.png"))
+                    plot_phase_img([target[-1].detach().cpu(), Z2P.cpu()], cmap="coolwarm", caxis=[-525,525], dpi=150,
+                                    save_name=test_path + "/gt_phase_img/" + "_".join(target_file.replace("\\", "/").split("/")[-2:]).replace("_ds_zernike.mat", "_gt_phase.png"))
 
+        tqdm.write("\nTest files saved to %s"%test_path)
 

@@ -123,7 +123,7 @@ def slope2zernike():
             path = "/".join(filename.replace("\\", "/").split("/")[:-1])
             Helper.makedirs(path + "/draw/")
             zernike = torch.from_numpy(io.loadmat(filename)["zernike"]).type(torch.float32)
-            Helper.plot_phase_img([zernike[3:], Z2P[3:]], cmap="coolwarm", caxis=[-525, 525],  
+            Helper.plot_phase_img([zernike[3:], Z2P[3:]], cmap="coolwarm", caxis=[-525, 525], dpi=150,   
                                   save_name=path + "/draw/" + filename.replace("\\", "/").split("/")[-1].replace("_ds_zernike.mat", "_ds_phase.png"))
     else:
         raise Exception("job type error!")
