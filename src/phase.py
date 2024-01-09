@@ -5,12 +5,12 @@ from scipy import io
 import glob
 from tqdm import tqdm
 
-DATA_PATH = "./data/phase_data/230408/set25/"
+DATA_PATH = "./data/phase_data/230408/set26/"
 CKPT_PATH = "./log/mlp/"
 MASK_PATH = "./data/settings/mask.mat"
 PHASE_ZERNIKE_PATH = "./data/settings/zernike_phase55.mat"
 PHASE_SIZE = 55
-JOB = "test"  # "train" or "test" or "infer" or "remove_sys" or "draw"
+JOB = "infer"  # "train" or "test" or "infer" or "remove_sys" or "draw"
 GPU_ID = 0  # set to None for cpu
 MASK_SIZE = [15,15]
 HIDDEN_SIZE = [300,500] # hidden layer size of mlp
@@ -92,13 +92,14 @@ def slope2zernike():
         model.inference(args["data_path"])
     elif args["job"] == "remove_sys":
         # load data
-        file_list1 = glob.glob(args["data_path"] + "/**/*_zernike.mat", recursive=True)
-        file_list = []
-        for filename in file_list1:
-            if "mlp" in filename:
-                file_list.append(filename)
-            elif filename.replace("_zernike.mat", "_mlp_zernike.mat") not in file_list1:
-                file_list.append(filename)
+        file_list = glob.glob(args["data_path"] + "/**/*_mlp_zernike.mat", recursive=True)
+        # file_list1 = glob.glob(args["data_path"] + "/**/*_zernike.mat", recursive=True)
+        # file_list = []
+        # for filename in file_list1:
+        #     if "mlp" in filename:
+        #         file_list.append(filename)
+        #     elif filename.replace("_zernike.mat", "_mlp_zernike.mat") not in file_list1:
+        #         file_list.append(filename)
         all_zernike = torch.stack([torch.from_numpy(io.loadmat(file)["zernike"]).type(torch.float32) for file in file_list], dim=0) # (n,c,h,w)
         mean_zernike = torch.mean(all_zernike, dim=0) # (c,h,w)
         for filename in file_list:
@@ -111,7 +112,7 @@ def slope2zernike():
         Z2P = torch.from_numpy(trans_dict["Z2P"]).type(torch.float32)
         # plot mean zernike
         Helper.plot_phase_img([mean_zernike, Z2P], cmap="coolwarm", save_name=args["data_path"] + "/sys_abr.png")
-        print("System aberration removed! Zernike phase saved to *_ds_zernike.mat.")
+        print("System aberration removed! Zernike phase saved as *_ds_zernike.mat.")
     elif args["job"] == "draw":
         # load zernike_phase
         trans_dict = io.loadmat(args["phase_zernike_path"].replace("55", str(args["phase_size"])))
@@ -125,6 +126,7 @@ def slope2zernike():
             zernike = torch.from_numpy(io.loadmat(filename)["zernike"]).type(torch.float32)
             Helper.plot_phase_img([zernike[3:], Z2P[3:]], cmap="coolwarm", caxis=[-525, 525], dpi=150,   
                                   save_name=path + "/draw/" + filename.replace("\\", "/").split("/")[-1].replace("_ds_zernike.mat", "_ds_phase.png"))
+        print("Zernike phase drawn! PNG files saved under draw/ folder.")
     else:
         raise Exception("job type error!")
 

@@ -7,8 +7,8 @@ from tqdm import tqdm
 from matplotlib import pyplot as plt
 
 
-REALIGN_DATA_PATH = "./data/realign_data/230408/set1/"
-PHASE_DATA_PATH = "./data/phase_data/230408/set1/"
+REALIGN_DATA_PATH = "./data/realign_data/230408/set1/"  # realign data path to load *.tif
+PHASE_DATA_PATH = "./data/phase_data/230408/set1/"  # phase data path to save slopemap into *.mat
 MASK_PATH = "./data/settings/mask.mat"
 GPU_ID = 0  # set to None for cpu
 TEST_VIEWS = [6,19,52,91,115,168,175,187,217]   # index in [0, n_view_x*n_view_y-1]
@@ -130,7 +130,8 @@ def img2slope():
                 Helper.tif_save_img(save_img, 
                                     args["phase_data_path"] + "/" + file.split("\\")[-1].replace(".tif", "_slope_view%d.png"%(test_view)),
                                     save_type="float32")
-
+                
+    tqdm.write("\nSlopemaps saved to %s\n"%(args["phase_data_path"]))
 
 
 
