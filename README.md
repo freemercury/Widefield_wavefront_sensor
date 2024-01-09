@@ -2,7 +2,7 @@
 
 [[paper](todo)]
 
-![figure1](.\docs\figure1.png)
+![figure1](https://github.com/freemercury/Widefield_wavefront_sensor/blob/main/docs/figure1.png)
 
 This is the official repository of "Direct Observation of Atmospheric Turbulence with a Video-rate Wide-field Wavefront Sensor". This repository contains codes, video demos and data of our work.
 
