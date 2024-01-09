@@ -1,4 +1,35 @@
 # Wide-field Wavefront Sensor (WWS)
 
-https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/e7592873-a67e-4a50-a9f9-81d36f76f4bd.mp4
+[[paper](todo)]
 
+![figure1](.\docs\figure1.png)
+
+This is the official repository of "Direct Observation of Atmospheric Turbulence with a Video-rate Wide-field Wavefront Sensor". This repository contains codes, video demos and data of our work.
+
+**Authors:** Yuduo Guo, Yuhan Hao, Sen Wan, Hao Zhang, Laiyu Zhu, Yi Zhang,  Jiamin Wu, Qionghai Dai & Lu Fang
+
+**Acknowledgements**: We acknowledge the support of the staff of the Xinglong 80cm Tsinghua - National Astronomical Observatory, Chinese Academic of Sciences.
+
+
+
+## Table of Content
+
+1. [Video Demos](#video-demos)
+2. [Data](#data)
+3. [Codes](#codes)
+
+## Video Demos
+
+### Wavefront Observation
+
+https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/5cb20112-dac5-49d5-a9a9-3eca3f946ae7.mp4
+
+### Wavefront Prediction
+
+
+
+## Data
+
+
+
+## Codes
