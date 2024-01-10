@@ -1,6 +1,7 @@
 from .auxiliary import *
 
 
+
 class SlopeEstimationModule(nn.Module):
     def __init__(self, batch_size, phantom_size, ctrl_size):
         """

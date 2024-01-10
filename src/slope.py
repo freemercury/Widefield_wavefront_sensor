@@ -7,8 +7,22 @@ from tqdm import tqdm
 from matplotlib import pyplot as plt
 
 
-REALIGN_DATA_PATH = "./data/realign_data/230408/set1/"  # realign data path to load *.tif
-PHASE_DATA_PATH = "./data/phase_data/230408/set1/"  # phase data path to save slopemap into *.mat
+def crop_meta_image(meta_image):
+    """
+    crop meta_image to multiple of 10
+
+    Parameters:
+        meta_image: torch.Tensor, shape (*, h, w)
+    
+    Returns:
+        meta_image: torch.Tensor, shape (*, h', w'), here h' and w' are multiple of 10
+    """
+    meta_shape = (meta_image.shape[-2]//10*10, meta_image.shape[-1]//10*10)
+    return meta_image[..., :meta_shape[0], :meta_shape[1]]
+
+
+REALIGN_DATA_PATH = "./data/realign_data/230406/set1/"  # realign data path to load *.tif
+PHASE_DATA_PATH = "./data/phase_data/230406/set1/"  # phase data path to save slopemap into *.mat
 MASK_PATH = "./data/settings/mask.mat"
 GPU_ID = 0  # set to None for cpu
 TEST_VIEWS = [6,19,52,91,115,168,175,187,217]   # index in [0, n_view_x*n_view_y-1]
@@ -91,7 +105,7 @@ def img2slope():
     # initialize model
     model = SlopeEstimation(device=device,
                             mask_size=args["mask_size"],
-                            phantom_size=args["img_size"],
+                            phantom_size=[i//10*10 for i in args["img_size"]],
                             phantom=None,
                             mask_path=args["mask_path"],
                             ref_view=args["ref_view_id"],
@@ -107,7 +121,7 @@ def img2slope():
 
     # img2slope
     for file in tqdm(realign_data_files):
-        phantom = Helper.tif_read_img(file).unsqueeze(1).to(device)
+        phantom = crop_meta_image(Helper.tif_read_img(file).unsqueeze(1).to(device))
         model.set_phantom(phantom, args["ref_view_id"])
         model.reset_shiftmap_models()
         model.train()

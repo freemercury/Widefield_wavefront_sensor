@@ -5,7 +5,7 @@ from scipy import io
 import glob
 from tqdm import tqdm
 
-DATA_PATH = "./data/phase_data/230408/set26/"
+DATA_PATH = "./data/phase_data/230406/set1/"
 CKPT_PATH = "./log/mlp/"
 MASK_PATH = "./data/settings/mask.mat"
 PHASE_ZERNIKE_PATH = "./data/settings/zernike_phase55.mat"
