@@ -21,8 +21,8 @@ def crop_meta_image(meta_image):
     return meta_image[..., :meta_shape[0], :meta_shape[1]]
 
 
-REALIGN_DATA_PATH = "./data/realign_data/230406/set1/"  # realign data path to load *.tif
-PHASE_DATA_PATH = "./data/phase_data/230406/set1/"  # phase data path to save slopemap into *.mat
+REALIGN_DATA_PATH = "./data/realign_data/230406/set2/"  # realign data path to load *.tif
+PHASE_DATA_PATH = "./data/phase_data/230406/set2/"  # phase data path to save slopemap into *.mat
 MASK_PATH = "./data/settings/mask.mat"
 GPU_ID = 0  # set to None for cpu
 TEST_VIEWS = [6,19,52,91,115,168,175,187,217]   # index in [0, n_view_x*n_view_y-1]

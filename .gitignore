@@ -4,6 +4,7 @@ data/open_source_data/
 __pycache__/
 docs/videos/
 docs/pictures/
+docs/data/
 log/
 temp.py
 rdm.md

@@ -2,7 +2,7 @@
 clear; clc;
 
 % config
-data_path = '..\data\phase_data\230408\set1';
+data_path = '..\data\phase_data\230406\set2';
 mask_path = '..\data\settings\mask.mat';
 desired_indices = 1:35; % zernike orders (Noll)
 crop_bound = 1;     % remove the outermost band (width = crop_bound)
