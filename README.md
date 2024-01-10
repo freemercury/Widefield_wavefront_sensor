@@ -18,6 +18,8 @@ This is the official repository of "Direct Observation of Atmospheric Turbulence
 2. [Data](#data)
 3. [Codes](#codes)
 
+
+
 ## Video Demos
 
 ### Wavefront Observation
@@ -28,9 +30,13 @@ https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/5cb201
 
 https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/942dda84-1d70-4589-a391-bb6aa8736e05.mp4
 
+
+
 ## Data
 
 Download demo data and pre-trained model weights [here](https://zenodo.org/records/10476938/files/WWS_data_log.rar?download=1). After unzipping the files, simply copy the `data` and `log` folders directly into the project's root directory.
+
+
 
 ## Codes
 
@@ -131,10 +137,10 @@ The images of the system-aberration-removed wavefront will be saved in `data/pha
 To evaluate the pre-trained model, run the following command:
 
 ```
-python src/pred.py --job test
+python src/pred.py --job test --config_path src/config_test.json
 ```
 
-The pre-trained weights will be loaded from `log/rclstm_17t7/ckpt/`. The R2/RMSE/SIGMA heatmap will be saved in `log/rclstm_17t7/eval/test*_ts*/heatmap`. The predicted wavefront will be saved in `log/rclstm_17t7/eval/test*_ts*/zernike`. The image of ground-truth and predicted wavefront will be saved in `log/rclstm_17t7/eval/test*_ts*/gt_phase_img` and `log/rclstm_17t7/eval/test*_ts*/pred_phase_img` respectively. 
+The pre-trained weights will be loaded from `log/rclstm_17t7/ckpt/`. The R2/RMSE/SIGMA heatmap will be saved in `log/rclstm_17t7/test*_ts*/heatmap/`. The predicted wavefront will be saved in `log/rclstm_17t7/test*_ts*/zernike`/. The image of ground-truth and predicted wavefront will be saved in `log/rclstm_17t7/test*_ts*/gt_phase_img/` and `log/rclstm_17t7/test*_ts*/pred_phase_img/` respectively. 
 
 For more options, use `--help` to check for more options.
 
@@ -144,22 +150,22 @@ python src/pred.py --help
 
 #### Training on the provided data
 
-Try to train the prediction model on the provided data by running the following command:
+Try to train another model on the provided data by running the following command:
 
 ```
-python src/pred.py --job train
+python src/pred.py --job train --config_path src/config_train.json
 ```
 
-The training log will be saved in `log/rclstm_*/`. 
+The training log will be saved in `log/rclstm_17t7_new/`. 
 
 #### Parameters of training
 
-The parameters of the model can be referred to and adjusted in `src/config.json`. One example of `src/config.json` is as follows:
+The parameters of the model can be referred to and adjusted in `src/config_train.json`. One example is as follows:
 
 ```json
 {
     "info": {
-        "name": "17t7_test"
+        "name": "17t7_new"
     },
     "model": {
         "n_dim": [[32,128,128],[128,32,32,32,32,32]], 

@@ -2,7 +2,7 @@ from helper import *
 import argparse
 from phase_prediction_model import PhasePrediction
 
-CONFIG_PATH = "./src/config.json"
+CONFIG_PATH = "./src/config_test.json"
 JOB = "test"  # "train" or "test"
 BEST_METRIC = "RMSE"
 PLOT_PHASE_SIZE = 55
