@@ -10,7 +10,7 @@ This is the official repository of "Direct Observation of Atmospheric Turbulence
 
 **Acknowledgements**: We acknowledge the support of the staff of the Xinglong 80cm Tsinghua - National Astronomical Observatory, Chinese Academic of Sciences.
 
-
+​    
 
 ## Table of Content
 
@@ -18,7 +18,7 @@ This is the official repository of "Direct Observation of Atmospheric Turbulence
 2. [Data](#data)
 3. [Codes](#codes)
 
-
+​    
 
 ## Video Demos
 
@@ -30,13 +30,13 @@ https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/5cb201
 
 https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/942dda84-1d70-4589-a391-bb6aa8736e05.mp4
 
-
+​    
 
 ## Data
 
 Download demo data and pre-trained model weights [here](https://zenodo.org/records/10476938/files/WWS_data_log.rar?download=1). After unzipping the files, simply copy the `data` and `log` folders directly into the project's root directory.
 
-
+​    
 
 ## Codes
 
