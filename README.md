@@ -84,7 +84,7 @@ python src/slope.py --help
 
 To obtain the wavefront from the slope map, you should run the *first chunk* of `src/phase.m` in MATLAB. You can refer to `src/phase.m` for more details. The output wavefront is saved as Coefficients of Zernike polynomials in the same path as `*_slope.mat`, named `*_zernike.mat`.
 
-#### MLP projector for faster 
+#### MLP projector for faster integration
 
 We also provide an MLP projector to obtain the wavefront from slope maps. The weights of the MLP projector are in `log/mlp/`. 
 
