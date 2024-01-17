@@ -487,23 +487,7 @@ class PhasePrediction(nn.Module):
             tqdm.write(log_string)
 
     def delete_ckpt(self, n_epoch):
-        test_R2_data = np.array(self.test_R2)
-        best_id = np.argmax(test_R2_data[:,1])
-        best_epoch_R2 = test_R2_data[best_id,0].item()
-
-        test_rmse_data = np.array(self.test_rmse)
-        best_id = np.argmin(test_rmse_data[:,1])
-        best_epoch_rmse = test_rmse_data[best_id,0].item()
-
-        test_sigma_data = np.array(self.test_sigma)
-        best_id = np.argmin(test_sigma_data[:,1])
-        best_epoch_sigma = test_sigma_data[best_id,0].item()
-
-        preserve_epoch = [best_epoch_R2, best_epoch_rmse, best_epoch_sigma, n_epoch - 1]
-
-        for i in range(n_epoch):
-            if i in preserve_epoch:
-                continue
+        for i in range(n_epoch - 1):
             ckpt_path = self.ckpt_path_gen(i)
             if op.exists(ckpt_path):
                 os.remove(ckpt_path)
@@ -535,25 +519,11 @@ class PhasePrediction(nn.Module):
         if remove_ckpt:
             self.delete_ckpt(self.kwargs['config']['epoch'])
 
-    def test(self, phase_size=55, best_epoch=-1, best_metric="RMSE", save_test_zernike=True, plot_test_zernike=True):
-        # find best epoch
-        if best_epoch < 0:
-            self.load(self.kwargs['config']['epoch'] - 1)
-            if best_metric == "RMSE":
-                best_epoch = find_best_epoch(self.test_rmse, "RMSE", self.kwargs["config"]["save_epoch"], max_best=False)
-            elif best_metric == "R2":
-                best_epoch = find_best_epoch(self.test_R2, "R2", self.kwargs["config"]["save_epoch"], max_best=True)
-            elif best_metric == "SIGMA":
-                best_epoch = find_best_epoch(self.test_sigma, "SIGMA", self.kwargs["config"]["save_epoch"], max_best=False)
-            else:
-                raise Exception("best_metric should be RMSE or R2 or SIGMA!")
-            log_string = "Found best epoch is %d by %s"%(best_epoch, best_metric)
-            log_txt(log_string + "\n", self.root + "log.txt")
-            tqdm.write(log_string)
-        self.load(best_epoch)
+    def test(self, phase_size=55, save_test_zernike=True, plot_test_zernike=True):
+        self.load(self.kwargs['config']['epoch'] - 1)
 
         # test path
-        test_path = self.root + "/test%d_ts%d/"%(best_epoch, self.kwargs["dataset"]["test_size"][0])
+        test_path = self.root + "/test%d_ts%d/"%(self.kwargs['config']['epoch'] - 1, self.kwargs["dataset"]["test_size"][0])
         makedirs(test_path + "/heatmap/")
         makedirs(test_path + "/zernike/")
         makedirs(test_path + "/gt_phase_img/")

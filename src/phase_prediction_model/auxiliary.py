@@ -222,33 +222,6 @@ def plot_phase_img(data, cmap='jet', save_name=None, dpi=300, caxis=None, show_c
         plt.imshow(img / 2 / np.pi * 525, cmap=cmap)
 
 
-def find_best_epoch(data, name, save_epoch=1, max_best=True):
-    """
-    Find best epoch according to data
-
-    Parameters:
-        data: [(epoch, data), ...] or ndarray or torch.Tensor, first column is epoch, second column is data
-        name: "R2", "SSIM", "PSNR", "SNR", "RMSE", "SIGMA"
-        save_epoch: int
-        max_best: bool, default=True, whether to choose max value as best value
-    """
-    if isinstance(data, list):
-        data = np.array(data)
-    if isinstance(data, torch.Tensor):
-        data = data.detach().cpu().numpy()
-
-    if name in ["R2", "SSIM", "SNR", "PSNR"]:
-        func = np.argmax
-    elif name in ["RMSE", "SIGMA"]:
-        func = np.argmin
-    else:
-        func = np.argmax if max_best else np.argmin
-
-    data = data[(data[:,0] + 1)%save_epoch == 0,:]
-    best_epoch = int(data[func(data, axis=0)[1],0])
-    return best_epoch
-
-
 
 class Plot:
     def __init__(self, dpi=300, save_name=None, show_grid=True, show_box=True, show_axis=True, transparent=False,
