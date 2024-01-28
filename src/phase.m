@@ -54,7 +54,7 @@ clear; clc;
 
 % config
 save_path = '..\data\settings';
-phase_size = 15;
+phase_size = 375;
 desired_indices = 1:35; % zernike orders (Noll)
 n_zernike = length(desired_indices);
 

@@ -5,12 +5,12 @@ from scipy import io
 import glob
 from tqdm import tqdm
 
-DATA_PATH = "./data/phase_data/230406/set2/"
+DATA_PATH = "./data/phase_data/set1_19x25/"
 CKPT_PATH = "./log/mlp/"
 MASK_PATH = "./data/settings/mask.mat"
 PHASE_ZERNIKE_PATH = "./data/settings/zernike_phase55.mat"
 PHASE_SIZE = 55
-JOB = "infer"  # "train" or "test" or "infer" or "remove_sys" or "draw"
+JOB = "draw"  # "train" or "test" or "infer" or "remove_sys" or "draw"
 GPU_ID = 0  # set to None for cpu
 MASK_SIZE = [15,15]
 HIDDEN_SIZE = [300,500] # hidden layer size of mlp
@@ -124,7 +124,7 @@ def slope2zernike():
             path = "/".join(filename.replace("\\", "/").split("/")[:-1])
             Helper.makedirs(path + "/draw/")
             zernike = torch.from_numpy(io.loadmat(filename)["zernike"]).type(torch.float32)
-            Helper.plot_phase_img([zernike[3:,1:-1,1:-1], Z2P[3:]], cmap="coolwarm", caxis=[-525, 525], dpi=150, 
+            Helper.plot_phase_img([zernike[3:,1:-1,1:-1], Z2P[3:]], cmap="coolwarm", caxis=[-525, 525], dpi=300, 
                                   save_name=path + "/draw/" + filename.replace("\\", "/").split("/")[-1].replace("_ds_zernike.mat", "_ds_phase.png"))
         print("Zernike phase drawn! PNG files saved under draw/ folder.")
     else:

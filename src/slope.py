@@ -21,8 +21,8 @@ def crop_meta_image(meta_image):
     return meta_image[..., :meta_shape[0], :meta_shape[1]]
 
 
-REALIGN_DATA_PATH = "./data/realign_data/230406/set2/"  # realign data path to load *.tif
-PHASE_DATA_PATH = "./data/phase_data/230406/set2/"  # phase data path to save slopemap into *.mat
+REALIGN_DATA_PATH = "./data/realign_data/set1/"  # realign data path to load *.tif
+PHASE_DATA_PATH = "./data/phase_data/set1/"  # phase data path to save slopemap into *.mat
 MASK_PATH = "./data/settings/mask.mat"
 GPU_ID = 0  # set to None for cpu
 TEST_VIEWS = [6,19,52,91,115,168,175,187,217]   # index in [0, n_view_x*n_view_y-1]
@@ -32,10 +32,10 @@ REF_VIEW_ID = 50    # index in [0, n_view_x*n_view_y-1]
 EPOCHS = [20,100]   # two epochs for coarse and fine training
 LRS = [1e-2,1e-3]   # two learning rates for coarse and fine training
 NORM_TYPE = "avg"  # "gauss" or "avg" or None
-POOLING_SIZE = [19,25]    # avg pooling
+POOLING_SIZE = [95,125]    # avg pooling
 KERNEL_SIZE = 21   # gaussian kernel size, must be odd
 SIGMA = 11               # gaussian kernel sigma
-CTRL_SIZE = [19,25]     # control points size
+CTRL_SIZE = [190,250]     # control points size
 LOSS_CROP_RATIO = 0.98
 LOSS_TYPE = "l2"   # "l2", "l1", "grad"
 
