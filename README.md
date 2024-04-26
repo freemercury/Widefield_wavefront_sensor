@@ -8,7 +8,7 @@ This is the official repository of "Direct Observation of Atmospheric Turbulence
 
 **Authors:** Yuduo Guo, Yuhan Hao, Sen Wan, Hao Zhang, Laiyu Zhu, Yi Zhang,  Jiamin Wu, Qionghai Dai & Lu Fang
 
-**Acknowledgements**: We acknowledge the support of the staff of the Xinglong 80cm Tsinghua - National Astronomical Observatory, Chinese Academic of Sciences.
+**Acknowledgements**: We acknowledge the support of the staff of the Xinglong 80cm Tsinghua - National Astronomical Observatory, Chinese Academic of Sciences. This project is supported in part by the National Natural Science Foundation of China (NSFC) (numbers 62125106, 61860206003 and 62088102, to L.F., number 62222508, to J.W.) and in part by Ministry of Science and Technology of China (contract number 2021ZD0109901, to L.F.).
 
 ​    
 
@@ -36,7 +36,14 @@ https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/d3069e
 
 Download demo data and pre-trained model weights [here](https://zenodo.org/records/10476938/files/WWS_data_log.rar?download=1). After unzipping the files, simply copy the `data` and `log` folders directly into the project's root directory.
 
-​    
+Download more raw light field data from the following links:
+
+* https://doi.org/10.5281/zenodo.11063896
+* 
+
+Due to the large size of raw data, we currently only open source a subset of the raw light field data. Should you require access to any datasets that have not yet been uploaded, please contact Yuduo Guo (gyd20@mails.tsinghua.edu.cn).
+
+
 
 ## Codes
 
