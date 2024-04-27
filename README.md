@@ -36,12 +36,12 @@ https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/d3069e
 
 Download demo data and pre-trained model weights [here](https://zenodo.org/records/10476938/files/WWS_data_log.rar?download=1). After unzipping the files, simply copy the `data` and `log` folders directly into the project's root directory.
 
-Download more raw light field data from the following links:
+Download more raw data from the following links:
 
 * https://doi.org/10.5281/zenodo.11063896
-* 
+* https://doi.org/10.5281/zenodo.11071397
 
-Due to the large size of raw data, we currently only open source a subset of the raw light field data. Should you require access to any datasets that have not yet been uploaded, please contact Yuduo Guo (gyd20@mails.tsinghua.edu.cn).
+Due to the large size of raw data, we currently only open source a subset of the raw data. Should you require access to any datasets that have not yet been uploaded, please contact fanglu@tsinghua.edu.cn (L.F.).
 
 
 
