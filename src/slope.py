@@ -32,10 +32,10 @@ REF_VIEW_ID = 50    # index in [0, n_view_x*n_view_y-1]
 EPOCHS = [20,100]   # two epochs for coarse and fine training
 LRS = [1e-2,1e-3]   # two learning rates for coarse and fine training
 NORM_TYPE = "avg"  # "gauss" or "avg" or None
-POOLING_SIZE = [95,125]    # avg pooling
+POOLING_SIZE = [19,25]    # avg pooling
 KERNEL_SIZE = 21   # gaussian kernel size, must be odd
 SIGMA = 11               # gaussian kernel sigma
-CTRL_SIZE = [190,250]     # control points size
+CTRL_SIZE = [19,25]     # control points size
 LOSS_CROP_RATIO = 0.98
 LOSS_TYPE = "l2"   # "l2", "l1", "grad"
 
