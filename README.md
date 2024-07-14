@@ -1,6 +1,6 @@
 # Wide-field Wavefront Sensor (WWS)
 
-[[paper](todo)]
+[[paper](https://www.nature.com/articles/s41566-024-01466-3)]
 
 ![figure1](https://github.com/freemercury/Widefield_wavefront_sensor/blob/main/docs/figure1.png)
 
