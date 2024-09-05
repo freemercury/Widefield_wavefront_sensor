@@ -34,7 +34,7 @@ https://github.com/freemercury/Widefield_wavefront_sensor/assets/70796826/d3069e
 
 ## Data
 
-Download demo data and pre-trained model weights [here](https://zenodo.org/records/10476938/files/WWS_data_log.rar?download=1). After unzipping the files, simply copy the `data` and `log` folders directly into the project's root directory.
+Download demo data and pre-trained model weights [here](https://zenodo.org/records/10476938/files/WWS_data_log.rar?download=1). After unzipping the files, simply copy the `data` and `log` folders directly into the project's root directory
 
 Download more raw data from the following links:
 
