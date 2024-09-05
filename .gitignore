@@ -1,6 +1,7 @@
 data/phase_data/
 data/realign_data/
 data/open_source_data/
+data1/
 __pycache__/
 docs/videos/
 docs/pictures/
